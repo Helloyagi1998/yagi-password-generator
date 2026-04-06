@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yagi Password Generator Pro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #081426, #10294d);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: white;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: white;
+      color: #222;
+      border-radius: 22px;
+      padding: 30px 25px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .title h1 {
+      color: #0b1f3a;
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .title p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .password-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .password-box input {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #f8f9fc;
+      font-weight: bold;
+    }
+
+    .password-box button {
+      background: #1d4ed8;
+      color: white;
+      border: none;
+      padding: 0 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .setting {
+      margin-bottom: 18px;
+    }
+
+    .setting label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #0b1f3a;
+    }
+
+    .setting input[type="range"] {
+      width: 100%;
+    }
+
+    .length-value {
+      text-align: right;
+      font-size: 14px;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    .checkbox-group {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8f9fc;
+      padding: 14px 16px;
+      border-radius: 12px;
+    }
+
+    .checkbox-item span {
+      font-weight: bold;
+      color: #0b1f3a;
+    }
+
+    .checkbox-item input {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: gold;
+      color: black;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+
+    .generate-btn:hover {
+      background: #e6b800;
+    }
+
+    .strength-box {
+      margin-top: 20px;
+      background: #f8f9fc;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .strength-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #0b1f3a;
+    }
+
+    .strength-bar {
+      height: 12px;
+      background: #ddd;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: 0.3s;
+    }
+
+    .tip {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 500px) {
+      .password-box {
+        flex-direction: column;
+      }
+
+      .password-box button {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="title">
+      <h1>🔐 Yagi Password Generator</h1>
+      <p>Create strong and secure passwords instantly</p>
+    </div>
+
+    <div class="password-box">
+      <input type="text" id="password" placeholder="Your password will appear here" readonly />
+      <button onclick="copyPassword()">Copy</button>
+    </div>
+
+    <div class="setting">
+      <label for="length">Password Length</label>
+      <input type="range" id="length" min="4" max="32" value="12" oninput="updateLengthValue()" />
+      <div class="length-value">Length: <span id="lengthValue">12</span></div>
+    </div>
+
+    <div class="checkbox-group">
+      <div class="checkbox-item">
+        <span>Uppercase Letters</span>
+        <input type="checkbox" id="uppercase" checked />
+      </div>
+
+      <div class="checkbox-item">
+        <span>Lowercase Letters</span>
+        <input type="checkbox" id="lowercase" checked />
+      </div>
+
+      <div class="checkbox-item">
+        <span>Numbers</span>
+        <input type="checkbox" id="numbers" checked />
+      </div>
+
+      <div class="checkbox-item">
+        <span>Symbols</span>
+        <input type="checkbox" id="symbols" checked />
+      </div>
+    </div>
+
+    <button class="generate-btn" onclick="generatePassword()">Generate Password</button>
+
+    <div class="strength-box">
+      <div class="strength-header">
+        <span>Password Strength</span>
+        <span id="strengthText">Weak</span>
+      </div>
+      <div class="strength-bar">
+        <div class="strength-fill" id="strengthFill"></div>
+      </div>
+    </div>
+
+    <p class="tip">Tip: Use a longer password with a mix of letters, numbers, and symbols for better security.</p>
+  </div>
+
+  <script>
+    const passwordInput = document.getElementById("password");
+    const lengthInput = document.getElementById("length");
+    const lengthValue = document.getElementById("lengthValue");
+    const strengthText = document.getElementById("strengthText");
+    const strengthFill = document.getElementById("strengthFill");
+
+    function updateLengthValue() {
+      lengthValue.textContent = lengthInput.value;
+    }
+
+    function generatePassword() {
+      const length = parseInt(lengthInput.value);
+      const includeUpper = document.getElementById("uppercase").checked;
+      const includeLower = document.getElementById("lowercase").checked;
+      const includeNumbers = document.getElementById("numbers").checked;
+      const includeSymbols = document.getElementById("symbols").checked;
+
+      const upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const lowerChars = "abcdefghijklmnopqrstuvwxyz";
+      const numberChars = "0123456789";
+      const symbolChars = "!@#$%^&*()_+[]{}<>?/|";
+
+      let allChars = "";
+
+      if (includeUpper) allChars += upperChars;
+      if (includeLower) allChars += lowerChars;
+      if (includeNumbers) allChars += numberChars;
+      if (includeSymbols) allChars += symbolChars;
+
+      if (allChars === "") {
+        alert("Please select at least one option!");
+        return;
+      }
+
+      let password = "";
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * allChars.length);
+        password += allChars[randomIndex];
+      }
+
+      passwordInput.value = password;
+      checkStrength(password, includeUpper, includeLower, includeNumbers, includeSymbols, length);
+    }
+
+    function checkStrength(password, upper, lower, numbers, symbols, length) {
+      let score = 0;
+
+      if (length >= 8) score++;
+      if (length >= 12) score++;
+      if (upper) score++;
+      if (lower) score++;
+      if (numbers) score++;
+      if (symbols) score++;
+
+      if (score <= 2) {
+        strengthText.textContent = "Weak";
+        strengthFill.style.width = "30%";
+        strengthFill.style.background = "red";
+      } else if (score <= 4) {
+        strengthText.textContent = "Medium";
+        strengthFill.style.width = "65%";
+        strengthFill.style.background = "orange";
+      } else {
+        strengthText.textContent = "Strong";
+        strengthFill.style.width = "100%";
+        strengthFill.style.background = "green";
+      }
+    }
+
+    function copyPassword() {
+      if (passwordInput.value === "") {
+        alert("Generate a password first!");
+        return;
+      }
+
+      passwordInput.select();
+      passwordInput.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Password copied!");
+    }
+
+    updateLengthValue();
+    generatePassword();
+  </script>
+
+</body>
+</html>
